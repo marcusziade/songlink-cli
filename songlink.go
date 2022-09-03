@@ -12,10 +12,14 @@ import (
 	"github.com/atotto/clipboard"
 )
 
+// The LinksResponse model
 type LinksResponse struct {
 	PageUrl string `json:"pageUrl"`
 }
 
+// Entrypoint of the app.
+// Asks the user to paste and confirm a music service URL
+// formats the input and passes it to the `LinksRequest` method
 func main() {
 	fmt.Print("Enter search URL...\n")
 	reader := bufio.NewReader(os.Stdin)
@@ -28,6 +32,9 @@ func main() {
 	LinksRequest(input)
 }
 
+// Takes a music service URL as input.
+// checks if the response is succesful, decodes the json,
+// copies the generated song.link URL to the clipboard and prints it to interface
 func LinksRequest(searchURL string) {
 	linksRes := LinksResponse{}
 
@@ -50,6 +57,7 @@ func LinksRequest(searchURL string) {
 	}
 }
 
+// Takes in a music service URL and builds the song.link API query
 func buildURL(searchURL string) string {
 	url := url.URL{
 		Scheme: "https",
