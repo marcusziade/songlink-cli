@@ -29,7 +29,7 @@ func main() {
 func LinksRequest(searchURL string) {
 	linksRes := LinksResponse{}
 
-response, err := http.Get(buildURL(searchURL))
+	response, err := http.Get(buildURL(searchURL))
 	if err != nil {
 		panic(err)
 	}
@@ -43,8 +43,7 @@ response, err := http.Get(buildURL(searchURL))
 			panic(err)
 		}
 		nonLocalURL := strings.ReplaceAll(linksRes.PageUrl, "/fi", "")
-		fmt.Println(nonLocalURL)
-		fmt.Print("Song.link URL copied to the clipboard")
+		fmt.Print("\nSuccess ✅\n", nonLocalURL, "\nSong.link URL copied to the clipboard")
 	}
 }
 
