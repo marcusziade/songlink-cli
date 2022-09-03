@@ -1,0 +1,36 @@
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    # Entrypoint to the application
+    main: ./songlink.go
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+brews:
+    - tap:
+          owner: marcusziade
+          name: homebrew-songlink-cli
+      folder: Formula
+      homepage: https://github.com/marcusziade/homebrew-songlink-cli
+      description: Paste an URL from any music service. The app will generate a song.link URL and copy it to your clipboard automatically
