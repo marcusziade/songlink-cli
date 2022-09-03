@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -13,13 +15,21 @@ type LinksResponse struct {
 }
 
 func main() {
-	LinksRequest("https://youtu.be/NObKVa0y9uo")
+	fmt.Print("Enter search URL...\n")
+	reader := bufio.NewReader(os.Stdin)
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("An error occured while reading input. Please try again", err)
+		return
+	}
+	input = strings.TrimSuffix(input, "\n")
+	LinksRequest(input)
 }
 
 func LinksRequest(searchURL string) {
 	linksRes := LinksResponse{}
 
-	response, err := http.Get(buildURL(searchURL))
+response, err := http.Get(buildURL(searchURL))
 	if err != nil {
 		panic(err)
 	}
@@ -34,6 +44,7 @@ func LinksRequest(searchURL string) {
 		}
 		nonLocalURL := strings.ReplaceAll(linksRes.PageUrl, "/fi", "")
 		fmt.Println(nonLocalURL)
+		fmt.Print("Song.link URL copied to the clipboard")
 	}
 }
 
