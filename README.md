@@ -8,8 +8,17 @@ Paste any music service URL. The app will automatically generate and copy a Song
 
 
 ## Installation
+
+# MacOS
 Homebrew<br>
 `brew install songlink-cli`
+
+# Windows
+`go build`
+\
+\
+`.\songlink-cli.git.exe`
+
 
 Manual<br>
 [Releases](https://github.com/marcusziade/songlink-cli/releases)
