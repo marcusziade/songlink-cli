@@ -12,7 +12,7 @@ Homebrew<br>
 `brew install songlink-cli`
 
 Manual<br>
-[Releases](https://github.com/marcusziade/songlink-cli/releases/tag/v1.0.2)
+[Releases](https://github.com/marcusziade/songlink-cli/releases)
 
 ## Contributions
 Fork and make a PR
