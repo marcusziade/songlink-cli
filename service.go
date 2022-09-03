@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/atotto/clipboard"
 )
 
 type LinksResponse struct {
@@ -43,6 +45,7 @@ func LinksRequest(searchURL string) {
 			panic(err)
 		}
 		nonLocalURL := strings.ReplaceAll(linksRes.PageUrl, "/fi", "")
+		clipboard.WriteAll(nonLocalURL)
 		fmt.Print("\nSuccess ✅\n", nonLocalURL, "\nSong.link URL copied to the clipboard")
 	}
 }
