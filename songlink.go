@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -21,26 +22,30 @@ type LinksResponse struct {
 // Asks the user to paste and confirm a music service URL
 // formats the input and passes it to the `LinksRequest` method
 func main() {
-	fmt.Print("Enter search URL...\n")
-	reader := bufio.NewReader(os.Stdin)
-	input, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Println("An error occured while reading input. Please try again", err)
-		return
+	for {
+		fmt.Print("Enter search URL:\n➡️ ")
+		reader := bufio.NewReader(os.Stdin)
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("An error occured while reading input. Please try again", err)
+			return
+		}
+
+		input = strings.TrimSuffix(input, "\n")
+		getLinks(input)
 	}
-	input = strings.TrimSuffix(input, "\n")
-	LinksRequest(input)
 }
 
 // Takes a music service URL as input.
 // checks if the response is succesful, decodes the json,
 // copies the generated song.link URL to the clipboard and prints it to interface
-func LinksRequest(searchURL string) {
+func getLinks(searchURL string) {
 	linksRes := LinksResponse{}
 
 	response, err := http.Get(buildURL(searchURL))
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
+		return
 	}
 
 	defer response.Body.Close()
@@ -49,11 +54,14 @@ func LinksRequest(searchURL string) {
 		decoder := json.NewDecoder(response.Body)
 		err := decoder.Decode(&linksRes)
 		if err != nil {
-			panic(err)
+			log.Fatal("Error decoding response")
+			return
 		}
 		nonLocalURL := strings.ReplaceAll(linksRes.PageUrl, "/fi", "")
 		clipboard.WriteAll(nonLocalURL)
-		fmt.Print("\nSuccess ✅\n", nonLocalURL, "\nSong.link URL copied to the clipboard")
+		fmt.Print("\nSuccess ✅\n", nonLocalURL, "\nSong.link URL copied to the clipboard\n\n")
+	} else {
+		fmt.Println("\n❌", response.Status, "Check the search URL and retry.")
 	}
 }
 
