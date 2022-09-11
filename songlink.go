@@ -2,13 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/atotto/clipboard"
+	"github.com/martinlindhe/notify"
 )
 
 // The LinksResponse model
@@ -22,6 +22,7 @@ type LinksResponse struct {
 func main() {
 	clipboard, err := clipboard.ReadAll()
 	if err != nil {
+		notify.Notify("Songlink", "Error", "Error reading clipboard", "Try again")
 		return
 	}
 	getLinks(clipboard)
@@ -50,9 +51,9 @@ func getLinks(searchURL string) {
 		}
 		nonLocalURL := strings.ReplaceAll(linksRes.PageUrl, "/fi", "")
 		clipboard.WriteAll(nonLocalURL)
-		fmt.Print("\nSuccess ✅\n", nonLocalURL, "\nSong.link URL copied to the clipboard\n\n")
+		notify.Notify("Success ✅", nonLocalURL, "Song.link URL copied to the clipboard", "")
 	} else {
-		fmt.Println("\n❌", response.Status, "Check the search URL and retry.")
+		notify.Notify("Error ❌", response.Status, "Check the music URL and retry.", "")
 	}
 }
 
