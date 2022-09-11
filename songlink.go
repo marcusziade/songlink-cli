@@ -1,13 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/atotto/clipboard"
@@ -22,18 +20,11 @@ type LinksResponse struct {
 // Asks the user to paste and confirm a music service URL
 // formats the input and passes it to the `LinksRequest` method
 func main() {
-	for {
-		fmt.Print("Enter search URL:\n➡️ ")
-		reader := bufio.NewReader(os.Stdin)
-		input, err := reader.ReadString('\n')
-		if err != nil {
-			fmt.Println("An error occured while reading input. Please try again", err)
-			return
-		}
-
-		input = strings.TrimSuffix(input, "\n")
-		getLinks(input)
+	clipboard, err := clipboard.ReadAll()
+	if err != nil {
+		return
 	}
+	getLinks(clipboard)
 }
 
 // Takes a music service URL as input.
