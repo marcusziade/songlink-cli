@@ -11,9 +11,17 @@ import (
 	"github.com/atotto/clipboard"
 )
 
-// The LinksResponse model
-type LinksResponse struct {
-	PageUrl string `json:"pageUrl"`
+type SonglinkResponse struct {
+	PageURL         string          `json:"pageUrl"`
+	LinksByPlatform LinksByPlatform `json:"linksByPlatform"`
+}
+
+type LinksByPlatform struct {
+	Spotify PlatformMusic `json:"spotify"`
+}
+
+type PlatformMusic struct {
+	URL string `json:"url"`
 }
 
 // Entrypoint of the app.
@@ -28,11 +36,21 @@ func main() {
 	getLinks(clipboard)
 }
 
-// Takes a music service URL as input.
-// checks if the response is succesful, decodes the json,
-// copies the generated song.link URL to the clipboard and prints it to interface
+// Used to fetch a song.link and Spotify URL for a music link in the clipboard.
+// Copies two things to the clipboard:
+// 1. A <> wrapped song.link url (This disables embedding in Discord)
+// 2. A Spotify URL if the song is available on Spotify. This URL will enable the Spotify embed player.
 func getLinks(searchURL string) {
-	linksRes := LinksResponse{}
+	platform := PlatformMusic{
+		URL: "",
+	}
+	links := LinksByPlatform{
+		Spotify: platform,
+	}
+	linksResponse := SonglinkResponse{
+		PageURL:         "",
+		LinksByPlatform: links,
+	}
 
 	response, err := http.Get(buildURL(searchURL))
 	if err != nil {
@@ -44,14 +62,22 @@ func getLinks(searchURL string) {
 
 	if response.StatusCode == http.StatusOK {
 		decoder := json.NewDecoder(response.Body)
-		err := decoder.Decode(&linksRes)
+		err := decoder.Decode(&linksResponse)
 		if err != nil {
 			log.Fatal("Error decoding response")
 			return
 		}
-		nonLocalURL := strings.ReplaceAll(linksRes.PageUrl, "/fi", "")
-		clipboard.WriteAll(nonLocalURL)
-		fmt.Print("\nSuccess ✅\n", nonLocalURL, "\nSong.link URL copied to the clipboard\n\n")
+		
+		nonLocalURL := strings.ReplaceAll(linksResponse.PageURL, "/fi", "")
+		spotifyURL := linksResponse.LinksByPlatform.Spotify.URL
+		outputString := fmt.Sprintf("<%s>\n\n%s", nonLocalURL, spotifyURL)
+
+		clipboard.WriteAll(outputString)
+
+		fmt.Print(
+			"\nSuccess ✅\n",
+			outputString,
+			"\nCopied to the clipboard\n\n")
 	} else {
 		fmt.Println("\n❌", response.Status, "Check the search URL and retry.")
 	}
