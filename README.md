@@ -1,19 +1,14 @@
-# songlink-cli
-A Song.Link CLI app written in Go
+# Usage
 
-Paste any music service URL. The app will automatically generate and copy a Song.link URL to your clipboard.
+Copy a music link onto your clipboard. Run songlink-cli in the terminal. The app will read your clipboard, fetch a song.link and spotify url, and copy them to your clipboard
 
+# Installation
 
-![CleanShot 2022-09-03 at 15 18 51](https://user-images.githubusercontent.com/47460844/188270174-c416a133-145c-48b6-92eb-98dbe56d3ac0.gif)
-
-
-## Installation
-
-# MacOS
+## MacOS
 Homebrew<br>
 `brew install songlink-cli`
 
-# Windows
+## Windows
 `go build`
 \
 \
@@ -23,5 +18,5 @@ Homebrew<br>
 Manual<br>
 [Releases](https://github.com/marcusziade/songlink-cli/releases)
 
-## Contributions
+# Contributions
 Fork and make a PR
