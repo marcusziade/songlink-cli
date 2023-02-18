@@ -14,13 +14,6 @@ brew install songlink-cli
 3. Build the executable: `go build -o songlink main.go`
 4. Run the program: `./songlink`
 
-### Windows
-```
-go build
-.\songlink-cli.git.exe
-```
-
-
 ### Download and run
 Go to [Releases](https://github.com/marcusziade/songlink-cli/releases) (Linux, macOS, Windows)
 
