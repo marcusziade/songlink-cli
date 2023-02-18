@@ -11,7 +11,7 @@ brew install songlink-cli
 #### Build
 1. Clone the repository: `git clone https://github.com/marcusziade/songlink-cli.git`
 2. Install dependencies: `go mod download`
-3. Build the executable: `go build -o songlink main.go`
+3. Build the executable: `go build -o songlink .`
 4. Run the program: `./songlink`
 
 ### Download and run
