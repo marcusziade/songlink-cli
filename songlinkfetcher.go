@@ -58,7 +58,8 @@ func GetLinks(searchURL string) error {
 	fmt.Print(
 		"\nSuccess ✅\n",
 		outputString,
-		"\nCopied to the clipboard\n\n")
+		"\nCopied to the clipboard\n\n",
+	)
 
 	return nil
 }
