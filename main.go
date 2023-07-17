@@ -8,27 +8,33 @@ import (
 )
 
 func main() {
-	err := run()
-	if err != nil {
+	err := run(); if err != nil {
 		fmt.Println("An error occurred:", err)
 	}
 }
 
 func run() error {
-	searchURL, err := clipboard.ReadAll()
-	if err != nil {
+	searchURL, err := clipboard.ReadAll(); if err != nil {
 		return fmt.Errorf("error reading clipboard: %w", err)
 	}
 
 	stopLoading := showLoadingIndicator()
 
-	err = GetLinks(searchURL)
-	if err != nil {
+	links, err := GetLinks(searchURL); if err != nil {
 		return fmt.Errorf("error getting links: %w", err)
 	}
-
+  
 	stopLoading <- true
 
+	err = clipboard.WriteAll(links); if err != nil {
+		return fmt.Errorf("error copying output string to clipboard: %w", err)
+	}
+
+	fmt.Print(
+		"\nSuccess ✅\n",
+		links,
+		"\nCopied to the clipboard\n\n",
+	)  
 	return nil
 }
 
