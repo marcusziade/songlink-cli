@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/atotto/clipboard"
 )
 
 type SonglinkResponse struct {
@@ -23,10 +21,9 @@ type PlatformMusic struct {
 	URL string `json:"url"`
 }
 
-func GetLinks(searchURL string) error {
-	response, err := makeRequest(searchURL)
-	if err != nil {
-		return err
+func GetLinks(searchURL string) (string, error) {
+	response, err := makeRequest(searchURL); if err != nil {
+		return "", err
 	}
 
 	platform := PlatformMusic{
@@ -41,9 +38,8 @@ func GetLinks(searchURL string) error {
 	}
 
 	decoder := json.NewDecoder(response.Body)
-	err = decoder.Decode(&linksResponse)
-	if err != nil {
-		return fmt.Errorf("error decoding JSON response: %w", err)
+	err = decoder.Decode(&linksResponse); if err != nil {
+		return "", fmt.Errorf("error decoding JSON response: %w", err)
 	}
 
 	nonLocalURL := strings.ReplaceAll(linksResponse.PageURL, "/fi", "")
@@ -53,25 +49,12 @@ func GetLinks(searchURL string) error {
 	if nonLocalURL != "" && spotifyURL != "" {
 		outputString = fmt.Sprintf("<%s>\n%s", nonLocalURL, spotifyURL)
 	}
-
-	err = clipboard.WriteAll(outputString)
-	if err != nil {
-		return fmt.Errorf("error copying output string to clipboard: %w", err)
-	}
-
-	fmt.Print(
-		"\nSuccess ✅\n",
-		outputString,
-		"\nCopied to the clipboard\n\n",
-	)
-
-	return nil
+	return outputString, nil
 }
 
 func makeRequest(searchURL string) (*http.Response, error) {
 	url := buildURL(searchURL)
-	response, err := http.Get(url)
-	if err != nil {
+	response, err := http.Get(url); if err != nil {
 		return nil, fmt.Errorf("error making HTTP request: %w", err)
 	}
 
