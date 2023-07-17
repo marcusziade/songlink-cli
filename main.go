@@ -30,6 +30,7 @@ func run() error {
 		return fmt.Errorf("error copying output string to clipboard: %w", err)
 	}
 
+  fmt.Print("\r")
 	fmt.Print(
 		"\nSuccess ✅\n",
 		links,
@@ -46,7 +47,6 @@ func showLoadingIndicator() chan bool {
 		for {
 			select {
 			case <-stopLoading:
-				fmt.Print("\r")
 				return
 			default:
 				fmt.Printf("\rLoading %s", chars[i])
