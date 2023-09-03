@@ -1,0 +1,14 @@
+name: MoodLint PR Title Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+jobs:
+  check-title:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Run MoodLint
+      uses: marcusziade/MoodLint@latest
