@@ -1,18 +1,27 @@
 package main
 
 import (
-	"fmt"
-	"sync"
-	"time"
+    "flag"
+    "fmt"
+    "sync"
+    "time"
 
-	"github.com/atotto/clipboard"
+    "github.com/atotto/clipboard"
+)
+
+var (
+    xFlag = flag.Bool("x", false, "Return the song.link URL without surrounding <>")
+    dFlag = flag.Bool("d", false, "Return the song.link URL surrounded by <> and the Spotify URL")
+    sFlag = flag.Bool("s", false, "Return only the Spotify URL")
 )
 
 func main() {
-	err := run()
-	if err != nil {
-		fmt.Println("An error occurred:", err)
-	}
+    flag.Parse()
+
+    err := run()
+    if err != nil {
+        fmt.Println("An error occurred:", err)
+    }
 }
 
 func run() error {

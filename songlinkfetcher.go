@@ -48,10 +48,16 @@ func GetLinks(searchURL string) error {
 
 	nonLocalURL := strings.ReplaceAll(linksResponse.PageURL, "/fi", "")
 	spotifyURL := linksResponse.LinksByPlatform.Spotify.URL
-	outputString := nonLocalURL
 
-	if nonLocalURL != "" && spotifyURL != "" {
+	var outputString string
+	if *xFlag {
+		outputString = fmt.Sprintf("%s\n%s", nonLocalURL, spotifyURL)
+	} else if *dFlag {
 		outputString = fmt.Sprintf("<%s>\n%s", nonLocalURL, spotifyURL)
+	} else if *sFlag {
+		outputString = spotifyURL
+	} else {
+		outputString = nonLocalURL
 	}
 
 	err = clipboard.WriteAll(outputString)

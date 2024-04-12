@@ -24,6 +24,7 @@ func TestMakeRequest(t *testing.T) {
 	if err != nil {
 		t.Errorf("makeRequest(%q) returned an unexpected error: %v", searchURL, err)
 	}
+
 	if response.StatusCode != http.StatusOK {
 		t.Errorf("makeRequest(%q) returned a non-OK HTTP response status: %s", searchURL, response.Status)
 	}
@@ -35,10 +36,12 @@ func TestMakeRequest(t *testing.T) {
 	if err != nil {
 		t.Errorf("makeRequest(%q) returned an invalid JSON response body: %v", searchURL, err)
 	}
+
 	if linksResponse.PageURL != "https://song.link/fi/i/1572919354" {
 		t.Errorf("makeRequest(%q) returned an unexpected page URL: %s", searchURL, linksResponse.PageURL)
 	}
-	if linksResponse.LinksByPlatform.Spotify.URL != "https://open.spotify.com/track/2Xtsv7BUMrNodQWH2JPOc0" {
+
+	if linksResponse.LinksByPlatform.Spotify.URL != "https://open.spotify.com/track/3Q6SAA2oHf6R0gh46bMWsp" {
 		t.Errorf("makeRequest(%q) returned an unexpected Spotify URL: %s", searchURL, linksResponse.LinksByPlatform.Spotify.URL)
 	}
 }
@@ -46,7 +49,6 @@ func TestMakeRequest(t *testing.T) {
 func TestBuildURL(t *testing.T) {
 	searchURL := "https://music.apple.com/fi/album/caravan/1572919347?i=1572919354"
 	expectedURL := "https://api.song.link/v1-alpha.1/links?url=https%3A%2F%2Fmusic.apple.com%2Ffi%2Falbum%2Fcaravan%2F1572919347%3Fi%3D1572919354"
-
 	actualURL := buildURL(searchURL)
 	if actualURL != expectedURL {
 		t.Errorf("buildURL(%q) = %q; want %q", searchURL, actualURL, expectedURL)
