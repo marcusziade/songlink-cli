@@ -53,13 +53,13 @@ Here are a few examples of how to use the Songlink CLI:
     ./songlink
     ```
 
--   Retrieve the Songlink URL without surrounding `<>`:
+-   Retrieve the Songlink URL without surrounding `<>` + Spotify embed:
 
     ```
     ./songlink -x
     ```
 
--   Retrieve the Songlink URL surrounded by `<>` and the Spotify URL:
+-   Retrieve the Songlink URL surrounded by `<>` + Spotify embed:
 
     ```
     ./songlink -d
