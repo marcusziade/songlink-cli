@@ -1,5 +1,7 @@
 # Songlink CLI
 
+[![Github All Releases](https://img.shields.io/github/downloads/marcusziade/songlink-cli/total.svg)](https://github.com/marcusziade/songlink-cli/releases)
+
 A Go program that retrieves Songlink and Spotify links for a given URL using the Songlink API. The output is designed to be shared as is, allowing the receiver to both use Songlink and listen to the song preview using Spotify's embed feature.
 
 ## Features
