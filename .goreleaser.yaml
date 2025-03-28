@@ -58,6 +58,6 @@ changelog:
       - Merge pull request
       - Merge branch
 
-# Signs the checksum file
-signs:
-  - artifacts: checksum
+# Disabled signing as we don't have GPG keys configured in CI
+# signs:
+#   - artifacts: checksum
