@@ -7,7 +7,8 @@ A Go program that retrieves Songlink and Spotify links for a given URL using the
 ## Features
 
 -   Retrieves Songlink and Spotify links for a given song or album URL
--   **NEW**: Search for songs and albums directly using Apple Music API
+-   Search for songs and albums directly using Apple Music API
+-   Download full tracks as MP3 or MP4 files with album artwork
 -   Supports command line arguments for customizing the output format
 -   Automatically copies the output to the clipboard for easy sharing
 -   Includes a loading indicator to provide visual feedback during the retrieval process
