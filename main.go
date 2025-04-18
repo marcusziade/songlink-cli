@@ -1,13 +1,15 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"os"
-	"sync"
-	"time"
+   "context"
+   "flag"
+   "fmt"
+   "os"
+   "strings"
+   "sync"
+   "time"
 
-	"github.com/atotto/clipboard"
+   "github.com/atotto/clipboard"
 )
 
 var (
@@ -30,11 +32,16 @@ var commands = []Command{
 		Description: "Search for a song or album and get its links",
 		Execute:     executeSearch,
 	},
-	{
-		Name:        "config",
-		Description: "Configure Apple Music API credentials",
-		Execute:     executeConfig,
-	},
+   {
+       Name:        "config",
+       Description: "Configure Apple Music API credentials",
+       Execute:     executeConfig,
+   },
+   {
+       Name:        "download",
+       Description: "Search for a song or album and download it as mp3 or mp4",
+       Execute:     executeDownload,
+   },
 }
 
 func main() {
@@ -74,9 +81,11 @@ func main() {
 
 // executeSearch handles the search subcommand
 func executeSearch(args []string) error {
-	// Define search flags
-	searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
-	typeFlag := searchCmd.String("type", "song", "Type of search: song, album, or both (default: song)")
+   // Define search flags
+   searchCmd := flag.NewFlagSet("search", flag.ExitOnError)
+   typeFlag := searchCmd.String("type", "song", "Type of search: song, album, or both (default: song)")
+   outFlag := searchCmd.String("out", "downloads", "Output directory for downloaded files")
+   debugFlag := searchCmd.Bool("debug", false, "Enable debug logging during download")
 	
 	// Parse search flags
 	if err := searchCmd.Parse(args); err != nil {
@@ -103,14 +112,93 @@ func executeSearch(args []string) error {
 		searchType = Both
 	}
 	
-	// Handle search
-	return HandleSearch(query, searchType)
+   // Handle search
+   return HandleSearch(query, searchType, *outFlag, *debugFlag)
 }
 
 // executeConfig handles the config subcommand
 func executeConfig(args []string) error {
 	fmt.Println("Configuring Apple Music API credentials...")
-	return RunOnboarding()
+   return RunOnboarding()
+}
+
+// executeDownload handles the download subcommand
+func executeDownload(args []string) error {
+   // Define download flags
+   downloadCmd := flag.NewFlagSet("download", flag.ExitOnError)
+   typeFlag := downloadCmd.String("type", "song", "Type of search: song, album, or both (default: song)")
+   formatFlag := downloadCmd.String("format", "mp3", "Download format: mp3 or mp4 (default: mp3)")
+   outFlag := downloadCmd.String("out", "downloads", "Output directory for downloaded files")
+   debugFlag := downloadCmd.Bool("debug", false, "Enable debug logging (show yt-dlp/ffmpeg output)")
+
+   // Parse flags
+   if err := downloadCmd.Parse(args); err != nil {
+       return err
+   }
+
+   // Get search query
+   queryArgs := downloadCmd.Args()
+   if len(queryArgs) == 0 {
+       return fmt.Errorf("download query required")
+   }
+   query := strings.Join(queryArgs, " ")
+
+   // Determine search type
+   var searchType SearchType
+   switch *typeFlag {
+   case "song":
+       searchType = Song
+   case "album":
+       searchType = Album
+   default:
+       searchType = Song
+   }
+
+   // Load config
+   config, err := LoadConfig()
+   if err != nil {
+       return fmt.Errorf("error loading config: %w", err)
+   }
+   if !config.ConfigExists {
+       fmt.Println("Apple Music API credentials not found. Let's set them up.")
+       if err := RunOnboarding(); err != nil {
+           return fmt.Errorf("error during onboarding: %w", err)
+       }
+       config, err = LoadConfig()
+       if err != nil {
+           return fmt.Errorf("error loading config after onboarding: %w", err)
+       }
+   }
+
+   // Create music searcher
+   searcher, err := NewMusicSearcher(config)
+   if err != nil {
+       return fmt.Errorf("error creating music searcher: %w", err)
+   }
+
+   // Search for music
+   ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+   defer cancel()
+   results, err := searcher.Search(ctx, query, searchType)
+   if err != nil {
+       return fmt.Errorf("error searching: %w", err)
+   }
+
+   // Display results and select
+   selected, err := DisplaySearchResults(results)
+   if err != nil {
+       return fmt.Errorf("error selecting result: %w", err)
+   }
+   fmt.Printf("\nSelected: %s - %s\n", selected.Name, selected.ArtistName)
+
+   // Download track via YouTube
+   fmt.Print("Downloading... ")
+   path, err := DownloadTrack(selected.Name, selected.ArtistName, selected.ArtworkURL, *formatFlag, *outFlag, *debugFlag)
+   if err != nil {
+       return fmt.Errorf("download error: %w", err)
+   }
+   fmt.Printf("Done. Saved to %s\n", path)
+   return nil
 }
 
 // runDefault runs the default behavior (process URL from clipboard)

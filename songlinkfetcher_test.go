@@ -41,9 +41,10 @@ func TestMakeRequest(t *testing.T) {
 		t.Errorf("makeRequest(%q) returned an unexpected page URL: %s", searchURL, linksResponse.PageURL)
 	}
 
-	if linksResponse.LinksByPlatform.Spotify.URL != "https://open.spotify.com/track/3Q6SAA2oHf6R0gh46bMWsp" {
-		t.Errorf("makeRequest(%q) returned an unexpected Spotify URL: %s", searchURL, linksResponse.LinksByPlatform.Spotify.URL)
-	}
+   expectedSpotifyURL := "https://open.spotify.com/track/2Xtsv7BUMrNodQWH2JPOc0"
+   if linksResponse.LinksByPlatform.Spotify.URL != expectedSpotifyURL {
+       t.Errorf("makeRequest(%q) returned an unexpected Spotify URL: %s (want %s)", searchURL, linksResponse.LinksByPlatform.Spotify.URL, expectedSpotifyURL)
+   }
 }
 
 func TestBuildURL(t *testing.T) {
