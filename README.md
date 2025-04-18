@@ -62,7 +62,12 @@ Go to [Releases](https://github.com/marcusziade/songlink-cli/releases) and downl
    
 3. Select from the search results by entering the number.
 
-4. The program will retrieve the Songlink and/or Spotify link for the selected song or album and copy it to your clipboard based on your flags.
+4. After selecting a result, you will be prompted to choose an action:
+   1) Copy the song.link + Spotify URL to clipboard  
+   2) Download the full track as MP3  
+   3) Download a video (MP4) with the album artwork
+
+5. If you choose to download, the file(s) will be saved in the `downloads/` directory by default.
 
 #### Search Flags
 
@@ -73,6 +78,26 @@ Go to [Releases](https://github.com/marcusziade/songlink-cli/releases) and downl
 Combined with output format flags:
 ```
 ./songlink search -type=album -d "Dark Side of the Moon"
+```
+
+### Download full tracks
+
+You can download the full track audio or a video with artwork.
+
+```bash
+./songlink download [flags] <query>
+```
+
+Flags:
+
+- `-type=song` / `album` / `both` (default: song) — Type of Apple Music search.  
+- `-format=mp3` / `mp4` (default: mp3) — Download as an audio file (MP3) or a video with artwork (MP4).  
+- `-out=DIR` (default: downloads) — Directory to save the downloaded files.
+
+Example:
+
+```bash
+./songlink download -type=song -format=mp4 "Purple Rain"
 ```
 
 ## Apple Music API Setup

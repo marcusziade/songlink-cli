@@ -33,6 +33,8 @@ type SearchResult struct {
 	ArtistName string
 	Type       SearchType
 	URL        string
+	// ArtworkURL is the URL of the track's artwork image
+	ArtworkURL string
 }
 
 // NewMusicSearcher creates a new MusicSearcher
@@ -87,12 +89,17 @@ func (ms *MusicSearcher) Search(ctx context.Context, query string, searchType Se
 		// Process songs
 		if st == string(musickitkat.SearchTypesSongs) && len(searchResults.Results.Songs.Data) > 0 {
 			for _, song := range searchResults.Results.Songs.Data {
+				// Build artwork URL with desired size (500x500)
+				artURL := song.Attributes.Artwork.URL
+				artURL = strings.ReplaceAll(artURL, "{w}", "500")
+				artURL = strings.ReplaceAll(artURL, "{h}", "500")
 				results = append(results, SearchResult{
 					ID:         song.ID,
 					Name:       song.Attributes.Name,
 					ArtistName: song.Attributes.ArtistName,
 					Type:       Song,
 					URL:        song.Attributes.URL,
+					ArtworkURL: artURL,
 				})
 			}
 		}
@@ -100,12 +107,17 @@ func (ms *MusicSearcher) Search(ctx context.Context, query string, searchType Se
 		// Process albums
 		if st == string(musickitkat.SearchTypesAlbums) && len(searchResults.Results.Albums.Data) > 0 {
 			for _, album := range searchResults.Results.Albums.Data {
+				// Build artwork URL with desired size (500x500)
+				artURL := album.Attributes.Artwork.URL
+				artURL = strings.ReplaceAll(artURL, "{w}", "500")
+				artURL = strings.ReplaceAll(artURL, "{h}", "500")
 				results = append(results, SearchResult{
 					ID:         album.ID,
 					Name:       album.Attributes.Name,
 					ArtistName: album.Attributes.ArtistName,
 					Type:       Album,
 					URL:        album.Attributes.URL,
+					ArtworkURL: artURL,
 				})
 			}
 		}
@@ -153,7 +165,9 @@ func DisplaySearchResults(results []SearchResult) (*SearchResult, error) {
 }
 
 // HandleSearch handles the search command
-func HandleSearch(query string, searchType SearchType) error {
+// HandleSearch performs an Apple Music search, then handles user action (copy links/download).
+// outDir is the directory to save downloads, debug controls verbosity of external tools.
+func HandleSearch(query string, searchType SearchType, outDir string, debug bool) error {
 	// Load config
 	config, err := LoadConfig()
 	if err != nil {
@@ -200,21 +214,47 @@ func HandleSearch(query string, searchType SearchType) error {
 		return fmt.Errorf("error searching: %w", err)
 	}
 
-	// Display results and get selection
-	selected, err := DisplaySearchResults(results)
+   // Display results and get selection
+   selected, err := DisplaySearchResults(results)
 	if err != nil {
 		return fmt.Errorf("error selecting result: %w", err)
 	}
 
-	fmt.Printf("\nSelected: %s - %s\n", selected.Name, selected.ArtistName)
-
-	// Get links from song.link API
-	err = GetLinks(selected.URL)
-	if err != nil {
-		return fmt.Errorf("error getting links: %w", err)
-	}
-
-	return nil
+   fmt.Printf("\nSelected: %s - %s\n", selected.Name, selected.ArtistName)
+   // Prompt user for next action
+   fmt.Println("\nWhat would you like to do?")
+   fmt.Println("1) Copy song.link + Spotify URL to clipboard")
+   fmt.Println("2) Download MP3")
+   fmt.Println("3) Download MP4 (video with artwork)")
+   fmt.Print("Enter choice (1-3, default 1): ")
+   var choice string
+   fmt.Scanln(&choice)
+   switch choice {
+   case "", "1":
+       // Copy links
+       if err := GetLinks(selected.URL); err != nil {
+           return fmt.Errorf("error getting links: %w", err)
+       }
+   case "2":
+       // Download MP3
+       fmt.Print("Downloading MP3... ")
+       path, err := DownloadTrack(selected.Name, selected.ArtistName, selected.ArtworkURL, "mp3", outDir, debug)
+       if err != nil {
+           return fmt.Errorf("error downloading mp3: %w", err)
+       }
+       fmt.Printf("Done. Saved to %s\n", path)
+   case "3":
+       // Download MP4
+       fmt.Print("Downloading MP4... ")
+       path, err := DownloadTrack(selected.Name, selected.ArtistName, selected.ArtworkURL, "mp4", outDir, debug)
+       if err != nil {
+           return fmt.Errorf("error downloading mp4: %w", err)
+       }
+       fmt.Printf("Done. Saved to %s\n", path)
+   default:
+       fmt.Println("Invalid choice, exiting.")
+   }
+   return nil
 }
 
 // RunOnboarding guides the user through setting up Apple Music API credentials
