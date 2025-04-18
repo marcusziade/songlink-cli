@@ -252,7 +252,37 @@ func HandleSearch(query string, searchType SearchType, outDir string, debug bool
        }
        fmt.Printf("Done. Saved to %s\n", path)
    default:
-       fmt.Println("Invalid choice, exiting.")
+       for {
+           fmt.Println("Invalid choice. Please enter a valid option (1-3, default 1):")
+           fmt.Print("Enter choice (1-3, default 1): ")
+           fmt.Scanln(&choice)
+           if choice == "" || choice == "1" || choice == "2" || choice == "3" {
+               break
+           }
+       }
+       switch choice {
+       case "", "1":
+           // Copy links
+           if err := GetLinks(selected.URL); err != nil {
+               return fmt.Errorf("error getting links: %w", err)
+           }
+       case "2":
+           // Download MP3
+           fmt.Print("Downloading MP3... ")
+           path, err := DownloadTrack(selected.Name, selected.ArtistName, selected.ArtworkURL, "mp3", outDir, debug)
+           if err != nil {
+               return fmt.Errorf("error downloading mp3: %w", err)
+           }
+           fmt.Printf("Done. Saved to %s\n", path)
+       case "3":
+           // Download MP4
+           fmt.Print("Downloading MP4... ")
+           path, err := DownloadTrack(selected.Name, selected.ArtistName, selected.ArtworkURL, "mp4", outDir, debug)
+           if err != nil {
+               return fmt.Errorf("error downloading mp4: %w", err)
+           }
+           fmt.Printf("Done. Saved to %s\n", path)
+       }
    }
    return nil
 }
